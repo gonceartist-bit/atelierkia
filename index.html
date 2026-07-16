@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, viewport-fit=cover">
+<title>بانک محتوای آموزشگاه</title>
+<meta name="description" content="اپ مدیریت محتوای هنری آموزشگاه نقاشی: ثبت آثار، تولید کپشن و هشتگ، مدیریت نمایشگاه‌ها">
+<meta name="theme-color" content="#C25A3C">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="بانک محتوا">
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root, [data-theme="warm"]{
+    --cream:#F7F4EF;
+    --sand:#EDE3D1;
+    --clay:#E9C7A8;
+    --accent:#C25A3C;
+    --accent-pale:#F1DCD2;
+    --ink:#3A3733;
+    --gray:#6B6B6B;
+    --line: rgba(58,55,51,0.10);
+    --radius: 18px;
+    --shadow: 0 6px 20px rgba(58,55,51,0.06);
+  }
+  [data-theme="neutral"]{
+    --cream:#F5F4F2;
+    --sand:#E8E6E1;
+    --clay:#D9D6CE;
+    --accent:#57534B;
+    --accent-pale:#E6E3DC;
+    --ink:#302E2B;
+    --gray:#726F69;
+    --line: rgba(48,46,43,0.10);
+  }
+  [data-theme="cool"]{
+    --cream:#F2F5F7;
+    --sand:#E3E9EC;
+    --clay:#CBD9E3;
+    --accent:#3E6B85;
+    --accent-pale:#DCE7EC;
+    --ink:#293338;
+    --gray:#5E6C73;
+    --line: rgba(41,51,56,0.10);
+  }
+  *{box-sizing:border-box;}
+  html{ height:100%; overscroll-behavior-y: none; }
+  body{
+    margin:0;
+    font-family:'Vazirmatn', Tahoma, sans-serif;
+    background: var(--cream);
+    color: var(--ink);
+    direction: rtl;
+    overscroll-behavior-y: none;
+    min-height: 100%;
+  }
+  #app{
+    max-width: 480px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--cream);
+    position: relative;
+    padding-bottom: calc(84px + env(safe-area-inset-bottom));
+    box-shadow: var(--shadow);
+  }
+  svg.ic{ display:block; flex-shrink:0; }
+  .topbar{
+    position: sticky; top:0; z-index:20;
+    background: var(--cream);
+    padding: calc(18px + env(safe-area-inset-top)) 18px 10px;
+    border-bottom: 1px solid var(--line);
+  }
+  .topbar h1{ font-size:18px; font-weight:700; margin:0 0 2px; letter-spacing:-0.2px; }
+  .topbar .sub{ font-size:12.5px; color:var(--gray); }
+  .icon-btn{
+    width:36px;height:36px;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background: var(--sand); border:none; cursor:pointer; color:var(--ink);
+  }
+  .topbar-row{ display:flex; align-items:center; justify-content:space-between; }
+  .content{ padding: 16px; }
+  .card{
+    background:#fff; border:1px solid var(--line); border-radius: var(--radius);
+    padding:16px; margin-bottom:14px; box-shadow: var(--shadow);
+  }
+  .btn{
+    display:inline-flex; align-items:center; justify-content:center; gap:7px;
+    background: var(--accent); color:#fff; border:none; border-radius:14px;
+    padding:13px 18px; font-family:inherit; font-weight:600; font-size:14px;
+    cursor:pointer; width:100%;
+  }
+  .btn:active{ opacity:.85; }
+  .btn.secondary{ background: var(--sand); color: var(--ink); }
+  .btn.ghost{ background:transparent; color:var(--accent); border:1.5px solid var(--accent); }
+  .btn.small{ width:auto; padding:8px 14px; font-size:13px; border-radius:10px; }
+  input, select, textarea{
+    font-family:inherit; width:100%; padding:11px 13px; border-radius:12px;
+    border:1.5px solid var(--line); background:#fff; font-size:14px; color:var(--ink);
+  }
+  input:focus, select:focus, textarea:focus{ outline:none; border-color:var(--accent); }
+  label.field-label{ font-size:12.5px; color:var(--gray); font-weight:600; margin-bottom:6px; display:block; }
+  .field{ margin-bottom:12px; }
+  .pill{
+    display:inline-flex; align-items:center; gap:5px; background:var(--sand); color:var(--ink); font-size:12px;
+    padding:5px 11px; border-radius:20px; margin:0 4px 4px 0; font-weight:500;
+  }
+  .pill.active{ background:var(--accent-pale); color:var(--accent); font-weight:600; }
+  h2.section-title{ font-size:14.5px; font-weight:700; margin:4px 0 10px; }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:10px; }
+  .stat-card{ background:#fff; border:1px solid var(--line); border-radius:16px; padding:14px; }
+  .stat-num{ font-size:21px; font-weight:700; }
+  .stat-label{ font-size:12px; color:var(--gray); margin-top:2px; }
+  .art-grid{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .art-tile{
+    border-radius:16px; overflow:hidden; background:var(--sand); position:relative;
+    aspect-ratio: 3/4; cursor:pointer; border:1px solid var(--line);
+  }
+  .art-tile img{ width:100%; height:100%; object-fit:cover; display:block; }
+  .art-tile .cap{
+    position:absolute; bottom:0; right:0; left:0; padding:8px 10px;
+    background:linear-gradient(transparent, rgba(0,0,0,.5));
+    color:#fff; font-size:12px; font-weight:600;
+  }
+  .badge{
+    position:absolute; top:8px; left:8px; background:rgba(255,255,255,.94); color:var(--accent);
+    font-size:10px; padding:3px 9px; border-radius:10px; font-weight:600;
+    display:flex; align-items:center; gap:3px;
+  }
+  .bottomnav{
+    position:fixed; bottom:0; right:50%; transform:translateX(50%);
+    width:100%; max-width:480px; background:#fff; border-top:1px solid var(--line);
+    display:flex; justify-content:space-around; align-items:center;
+    padding:8px 6px calc(10px + env(safe-area-inset-bottom)); z-index:30;
+  }
+  .nav-item{
+    display:flex; flex-direction:column; align-items:center; gap:3px; font-size:10px;
+    color:var(--gray); background:none; border:none; cursor:pointer; font-family:inherit; font-weight:500;
+    padding:4px 8px;
+  }
+  .nav-item.active{ color:var(--accent); font-weight:600; }
+  .fab{
+    background:var(--accent); color:#fff; width:44px; height:44px; border-radius:50%;
+    display:flex; align-items:center; justify-content:center; border:none; cursor:pointer;
+    box-shadow:0 6px 14px rgba(0,0,0,.22); margin-top:-20px;
+  }
+  .empty{ text-align:center; padding:40px 16px; color:var(--gray); }
+  .empty .e-ic{ margin-bottom:10px; display:flex; justify-content:center; color:var(--gray); opacity:.7; }
+  .row{ display:flex; align-items:center; justify-content:space-between; }
+  .back-row{ display:flex; align-items:center; gap:10px; }
+  .list-item{
+    display:flex; align-items:center; gap:12px; background:#fff; border:1px solid var(--line);
+    border-radius:14px; padding:12px; margin-bottom:10px; cursor:pointer;
+  }
+  .list-item img.thumb{ width:52px; height:52px; border-radius:10px; object-fit:cover; background:var(--sand); }
+  .avatar{
+    width:44px;height:44px;border-radius:50%; background:var(--clay); color:var(--ink); font-weight:700;
+    display:flex; align-items:center; justify-content:center; font-size:15px;
+  }
+  .avatar.ic-avatar{ background:var(--accent-pale); color:var(--accent); }
+  .divider{ height:1px; background:var(--line); margin:14px 0; }
+  .tabbar{ display:flex; gap:8px; margin-bottom:14px; overflow-x:auto; }
+  .tab{
+    background:var(--sand); border:none; border-radius:12px; padding:8px 13px; font-family:inherit;
+    font-size:12.5px; font-weight:500; color:var(--ink); cursor:pointer; white-space:nowrap;
+  }
+  .tab.active{ background:var(--accent-pale); color:var(--accent); font-weight:600; }
+  .sheet-overlay{
+    position:fixed; inset:0; background:rgba(41,38,35,.35); z-index:40; display:flex; align-items:flex-end; justify-content:center;
+  }
+  .sheet{
+    max-width:480px; width:100%; background:var(--cream); border-radius:22px 22px 0 0; padding:20px;
+    max-height:82vh; overflow-y:auto;
+  }
+  .sheet-handle{ width:40px; height:4px; background:var(--line); border-radius:4px; margin:0 auto 14px; }
+  .toast{
+    position:fixed; bottom:100px; right:50%; transform:translateX(50%); background:var(--ink); color:#fff;
+    padding:12px 20px; border-radius:14px; font-size:13.5px; font-weight:500; z-index:60; max-width:400px; text-align:center;
+  }
+  .upload-box{
+    border:1.5px dashed var(--clay); border-radius:16px; padding:24px 14px; text-align:center; color:var(--gray);
+    background:#fff; display:flex; flex-direction:column; align-items:center; gap:8px; font-size:13px;
+  }
+  .upload-box img{ max-width:100%; max-height:160px; border-radius:12px; }
+  .stepper{ display:flex; gap:6px; margin-bottom:16px; }
+  .step-dot{ flex:1; height:5px; border-radius:4px; background:var(--line); }
+  .step-dot.done{ background:var(--accent); }
+  ::-webkit-scrollbar{ width:0; height:0; }
+  .qr{
+    width:120px; height:120px; margin:0 auto; background:#fff; padding:8px; border-radius:10px; border:1px solid var(--line);
+  }
+  .theme-swatch-row{ display:flex; gap:8px; }
+  .theme-swatch{
+    flex:1; border-radius:12px; padding:10px 8px; text-align:center; cursor:pointer; border:1.5px solid var(--line);
+    background:#fff; font-size:12.5px; font-weight:500; color:var(--ink);
+  }
+  .theme-swatch.active{ border-color:var(--accent); color:var(--accent); font-weight:600; background:var(--accent-pale); }
+  .theme-dots{ display:flex; gap:4px; justify-content:center; margin-bottom:6px; }
+  .theme-dot{ width:14px; height:14px; border-radius:50%; border:1px solid var(--line); }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script>
+/* ---------------- Storage & State ---------------- */
+const DEFAULT_DATA = {
+  settings: { schoolName: "آموزشگاه هنری بانک محتوا", geminiKey: "", theme: "warm" },
+  students: [
+    { id: "s1", name: "سارا محمدی", age: 11 },
+    { id: "s2", name: "آریا رضایی", age: 13 },
+    { id: "s3", name: "هانیه کریمی", age: 14 }
+  ],
+  artworks: [],
+  ideas: [],
+  exhibitions: [],
+  schedule: [],
+  mediaVault: []
+};
+
+let DATA = null;
+let VIEW = { name: "home", params: {} };
+let TOAST_TIMER = null;
+
+/* ---------------- Storage abstraction ----------------
+   Inside Claude, window.storage (provided by the artifact host) is used.
+   Outside Claude (GitHub Pages, installed PWA, any regular browser) that
+   object doesn't exist, so we fall back to a same-shaped IndexedDB store.
+   IndexedDB is used instead of localStorage because this app stores
+   base64 images, which can quickly exceed localStorage's ~5MB quota. */
+const IDB_NAME = 'atelier-store', IDB_STORE = 'kv';
+let _idbPromise = null;
+function idbOpen(){
+  if(_idbPromise) return _idbPromise;
+  _idbPromise = new Promise((resolve, reject)=>{
+    if(!('indexedDB' in window)) { reject(new Error('no indexedDB')); return; }
+    const req = indexedDB.open(IDB_NAME, 1);
+    req.onupgradeneeded = ()=> req.result.createObjectStore(IDB_STORE);
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+  return _idbPromise;
+}
+async function idbGet(key){
+  const db = await idbOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_STORE, 'readonly');
+    const req = tx.objectStore(IDB_STORE).get(key);
+    req.onsuccess = ()=> resolve(req.result);
+    req.onerror = ()=> reject(req.error);
+  });
+}
+async function idbSet(key, value){
+  const db = await idbOpen();
+  return new Promise((resolve, reject)=>{
+    const tx = db.transaction(IDB_STORE, 'readwrite');
+    tx.objectStore(IDB_STORE).put(value, key);
+    tx.oncomplete = ()=> resolve(true);
+    tx.onerror = ()=> reject(tx.error);
+  });
+}
+
+const HAS_CLAUDE_STORAGE = (typeof window !== 'undefined' && !!window.storage && typeof window.storage.get === 'function');
+
+const Store = {
+  async get(key){
+    if(HAS_CLAUDE_STORAGE){
+      try{ return await window.storage.get(key); }catch(e){ /* fall through to local */ }
+    }
+    try{
+      const value = await idbGet(key);
+      return value != null ? { key, value } : null;
+    }catch(e){
+      try{ const v = localStorage.getItem(key); return v!=null ? {key, value:v} : null; }
+      catch(e2){ return null; }
+    }
+  },
+  async set(key, value){
+    if(HAS_CLAUDE_STORAGE){
+      try{ return await window.storage.set(key, value); }catch(e){ /* fall through to local */ }
+    }
+    try{ await idbSet(key, value); return { key, value }; }
+    catch(e){
+      try{ localStorage.setItem(key, value); return { key, value }; }
+      catch(e2){ console.error('storage error', e2); return null; }
+    }
+  }
+};
+
+async function loadData(){
+  try{
+    const res = await Store.get('atelier-data');
+    DATA = res && res.value ? JSON.parse(res.value) : structuredClone(DEFAULT_DATA);
+  }catch(e){
+    DATA = structuredClone(DEFAULT_DATA);
+  }
+  // Guard against older saved data missing newer fields
+  DATA = Object.assign({}, structuredClone(DEFAULT_DATA), DATA);
+  DATA.settings = Object.assign({}, DEFAULT_DATA.settings, DATA.settings||{});
+  applyTheme();
+  render();
+  registerSW();
+  setupInstallPrompt();
+}
+
+/* ---------------- Theme system ---------------- */
+const THEMES = {
+  warm:    { label: "گرم",  colors: ['#F7F4EF','#EDE3D1','#E9C7A8','#C25A3C','#6B6B6B'] },
+  neutral: { label: "خنثی", colors: ['#F5F4F2','#E8E6E1','#D9D6CE','#57534B','#726F69'] },
+  cool:    { label: "سرد",  colors: ['#F2F5F7','#E3E9EC','#CBD9E3','#3E6B85','#5E6C73'] }
+};
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', DATA.settings.theme || 'warm');
+}
+function setTheme(name){
+  DATA.settings.theme = name;
+  applyTheme();
+  saveData();
+  render();
+}
+
+/* ---------------- Simple line-icon set (monochrome, uses currentColor) ---------------- */
+const ICONS = {
+  home: '<path d="M3 10.5 12 3l9 7.5"/><path d="M5.5 9.5V20a1 1 0 0 0 1 1h4v-6h3v6h4a1 1 0 0 0 1-1V9.5"/>',
+  image: '<rect x="3" y="4" width="18" height="16" rx="2.5"/><circle cx="8.5" cy="9.5" r="1.4"/><path d="m21 15.5-4.5-4.5-9 9"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>',
+  calendar: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18"/>',
+  menu: '<path d="M4 7h16M4 12h16M4 17h16"/>',
+  camera: '<path d="M4 8a2 2 0 0 1 2-2h1.3l1-1.5h7.4l1 1.5H18a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2Z"/><circle cx="12" cy="13" r="3.2"/>',
+  folder: '<path d="M3 7.5a2 2 0 0 1 2-2h4l1.8 2H19a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"/>',
+  tag: '<path d="m3 11 8-8h7a2 2 0 0 1 2 2v7l-8 8a1.5 1.5 0 0 1-2.1 0l-6.9-6.9a1.5 1.5 0 0 1 0-2.1Z"/><circle cx="15.2" cy="8.8" r="1"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1-1.6 1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1 1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1Z"/>',
+  users: '<circle cx="9" cy="8" r="3.2"/><path d="M3.2 20c0-3.3 2.6-6 5.8-6s5.8 2.7 5.8 6"/><circle cx="17.2" cy="9.3" r="2.5"/><path d="M15.3 14.3c2.3.6 3.9 2.6 3.9 5.2"/>',
+  building: '<rect x="4" y="3" width="16" height="18" rx="1.2"/><path d="M8 7.5h1M8 11.5h1M8 15.5h1M15 7.5h1M15 11.5h1M15 15.5h1"/>',
+  bulb: '<path d="M9.5 18.5h5M10.3 21h3.4"/><path d="M12 3.2a6 6 0 0 0-3.8 10.6c.6.5 1 1.3 1.1 2.1h5.4c.1-.8.5-1.6 1.1-2.1A6 6 0 0 0 12 3.2Z"/>',
+  printer: '<path d="M6.5 9V3.5h11V9"/><rect x="4" y="9" width="16" height="7.5" rx="1.5"/><path d="M6.5 16.5h11v4h-11z"/>',
+  chart: '<path d="M4.5 20V11M10.3 20V4M16 20v-6M21.5 20H2.5"/>',
+  close: '<path d="M6 6l12 12M18 6 6 18"/>',
+  refresh: '<path d="M20 12a8 8 0 1 1-2.3-5.6"/><path d="M20 4v5.3h-5.3"/>',
+  bookmark: '<path d="M6.5 3.5h11v17l-5.5-3.7-5.5 3.7Z"/>',
+  sparkle: '<path d="M12 3.5 13.7 8.3 18.5 10l-4.8 1.7L12 16.5l-1.7-4.8L5.5 10l4.8-1.7Z"/>',
+  globe: '<circle cx="12" cy="12" r="8.6"/><path d="M3.4 12h17.2M12 3.4c2.3 2.2 3.6 5.2 3.6 8.6s-1.3 6.4-3.6 8.6M12 3.4c-2.3 2.2-3.6 5.2-3.6 8.6s1.3 6.4 3.6 8.6"/>',
+  file: '<path d="M7 3.5h6.5l4.5 4.5V20a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4.5a1 1 0 0 1 1-1Z"/><path d="M13.3 3.5V8h4.5"/>',
+  help: '<circle cx="12" cy="12" r="8.7"/><path d="M9.6 9.3a2.5 2.5 0 0 1 4.9.7c0 1.7-2.4 2-2.4 3.8"/><path d="M12 17h.01"/>',
+  print: '<path d="M6.5 9V3.5h11V9"/><rect x="4" y="9" width="16" height="7.5" rx="1.5"/><path d="M6.5 16.5h11v4h-11z"/>',
+  pin: '<path d="M12 21s6.5-5.9 6.5-11a6.5 6.5 0 1 0-13 0c0 5.1 6.5 11 6.5 11Z"/><circle cx="12" cy="10" r="2.2"/>'
+};
+function icon(name, size=18){
+  return `<svg class="ic" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${ICONS[name]||''}</svg>`;
+}
+
+async function saveData(){
+  try{ await Store.set('atelier-data', JSON.stringify(DATA)); }
+  catch(e){ console.error('storage error', e); }
+}
+
+function uid(){ return Math.random().toString(36).slice(2,10); }
+
+/* ---------------- PWA: service worker + install prompt ---------------- */
+function registerSW(){
+  if('serviceWorker' in navigator){
+    // sw.js only exists when this app is deployed as static files (e.g. GitHub Pages).
+    // Inside the Claude artifact sandbox this file won't be found, which is fine - it just no-ops.
+    navigator.serviceWorker.register('sw.js').catch(()=>{ /* not available in this environment, ignore */ });
+  }
+}
+let DEFERRED_INSTALL_PROMPT = null;
+function setupInstallPrompt(){
+  window.addEventListener('beforeinstallprompt', (e)=>{
+    e.preventDefault();
+    DEFERRED_INSTALL_PROMPT = e;
+  });
+}
+async function triggerInstall(){
+  if(!DEFERRED_INSTALL_PROMPT){ toast('برای نصب: از منوی مرورگر گزینه «افزودن به صفحه اصلی» را بزن'); return; }
+  DEFERRED_INSTALL_PROMPT.prompt();
+  await DEFERRED_INSTALL_PROMPT.userChoice;
+  DEFERRED_INSTALL_PROMPT = null;
+}
+
+/* ---------------- Backup / restore (local storage can be cleared by the OS or browser,
+   so a manual JSON export/import is the safety net for this app's data) ---------------- */
+async function exportBackup(){
+  const filename = `atelier-backup-${new Date().toISOString().slice(0,10)}.json`;
+  const jsonStr = JSON.stringify(DATA, null, 2);
+
+  // Prefer the native "Save As" folder picker (Chrome/Edge desktop, and some
+  // newer Android Chrome builds) so the backup doesn't just fall into the
+  // generic Downloads folder mixed with everything else.
+  if('showSaveFilePicker' in window){
+    try{
+      const handle = await window.showSaveFilePicker({
+        suggestedName: filename,
+        types: [{ description: 'فایل پشتیبان JSON', accept: { 'application/json': ['.json'] } }]
+      });
+      const writable = await handle.createWritable();
+      await writable.write(jsonStr);
+      await writable.close();
+      toast('فایل پشتیبان در پوشه‌ی انتخابی ذخیره شد');
+      return;
+    }catch(e){
+      if(e && e.name === 'AbortError') return; // user cancelled the picker on purpose
+      // any other error (unsupported edge case): fall through to legacy download below
+    }
+  }
+
+  // Fallback for browsers without the File System Access API (Safari, Firefox,
+  // most mobile browsers): this can't offer a folder picker, so it lands in
+  // the browser's default Downloads location instead.
+  const blob = new Blob([jsonStr], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+  toast('این مرورگر امکان انتخاب پوشه را ندارد؛ فایل در پوشه‌ی Downloads دانلود شد');
+}
+function importBackupFile(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const parsed = JSON.parse(reader.result);
+      if(!parsed || typeof parsed !== 'object') throw new Error('invalid file');
+      if(!confirm('بازیابی این فایل، تمام اطلاعات فعلی اپ را جایگزین می‌کند. ادامه می‌دهی؟')) return;
+      DATA = Object.assign({}, structuredClone(DEFAULT_DATA), parsed);
+      DATA.settings = Object.assign({}, DEFAULT_DATA.settings, parsed.settings||{});
+      applyTheme(); saveData(); render();
+      toast('اطلاعات با موفقیت بازیابی شد');
+    }catch(err){
+      toast('فایل پشتیبان معتبر نیست');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = '';
+}
+
+function goto(name, params={}, _fromPop){
+  VIEW = { name, params };
+  if(!_fromPop){
+    try{
+      let safeParams = {};
+      try{ safeParams = JSON.parse(JSON.stringify(params)); }catch(e){ safeParams = {}; }
+      history.pushState({ name, params: safeParams }, '', '#'+name);
+    }catch(e){ /* history API unavailable, ignore */ }
+  }
+  render(); window.scrollTo(0,0);
+}
+window.addEventListener('popstate', (e)=>{
+  if(e.state && e.state.name){ goto(e.state.name, e.state.params||{}, true); }
+  else { goto('home', {}, true); }
+});
+
+function toast(msg){
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  clearTimeout(TOAST_TIMER);
+  setTimeout(()=>el.remove(), 2200);
+}
+
+/* ---------------- Mock content generation ---------------- */
+const CAPTION_OPENERS = [
+  "نگاهی تازه به دنیای رنگ‌ها 🎨",
+  "این اثر داستانی برای گفتن دارد ✨",
+  "لحظه‌ای از خلاقیت بی‌مرز یک هنرجو",
+  "وقتی تخیل روی بوم جان می‌گیرد 🖌️",
+  "یک قدم دیگر در مسیر هنر"
+];
+const CAPTION_BODIES = [
+  "این اثر با تکنیک {technique} و موضوع {subject} توسط {student} ({age} ساله) خلق شده است.",
+  "{student} با تمرکز روی {subject}، تکنیک {technique} را با ظرافت خاصی تجربه کرده.",
+  "در این جلسه، {student} یاد گرفت چطور با {technique} حس و حال {subject} را روی کاغذ بیاورد."
+];
+const CAPTION_CLOSERS = [
+  "افتخار می‌کنیم به رشد هر هنرجو 🌱",
+  "برای دیدن آثار بیشتر، صفحه‌مان را دنبال کنید.",
+  "نظرتان درباره‌ی این اثر را برایمان بنویسید 💬"
+];
+const HASHTAG_POOL = ["#هنر", "#نقاشی_کودک", "#آموزشگاه_نقاشی", "#هنر_ایرانی", "#خلاقیت", "#هنرجو", "#کلاس_نقاشی", "#نقاشی_کودکان"];
+
+function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+function generateCaption(art){
+  const body = pick(CAPTION_BODIES)
+    .replace('{technique}', art.technique || 'آزاد')
+    .replace('{subject}', art.subject || 'خیال‌انگیز')
+    .replace('{student}', art.student || 'هنرجو')
+    .replace('{age}', art.age || '—');
+  const caption = `${pick(CAPTION_OPENERS)}\n\n${body}\n\n${pick(CAPTION_CLOSERS)}`;
+  const tags = [];
+  const pool = [...HASHTAG_POOL];
+  while(tags.length < 5 && pool.length){
+    const i = Math.floor(Math.random()*pool.length);
+    tags.push(pool.splice(i,1)[0]);
+  }
+  if(art.technique) tags.push('#'+art.technique.replace(/\s/g,'_'));
+  return { caption, hashtags: tags };
+}
+
+const REEL_TEMPLATES = [
+  { title: "پشت صحنه کلاس", desc: "چند ثانیه از فضای واقعی کلاس و تمرکز هنرجوها هنگام کار روی این اثر." },
+  { title: "قبل و بعد", desc: "نمایش مراحل اولیه‌ی طرح تا نسخه‌ی نهایی اثر، به‌صورت تایم‌لپس." },
+  { title: "مصاحبه کوتاه با هنرجو", desc: "یک سوال ساده از هنرجو درباره‌ی الهام‌بخش این اثر." },
+  { title: "جزئیات نزدیک از بافت اثر", desc: "کلوزآپ از قلم‌مو، رنگ‌ها و بافت کار برای نمایش کیفیت اجرا." },
+  { title: "چالش هفت روزه نقاشی", desc: "دعوت هنرجوها به شرکت در یک چالش کوتاه با موضوع مشابه." }
+];
+
+function generateReelIdea(){
+  const t = pick(REEL_TEMPLATES);
+  return { title: t.title, desc: t.desc };
+}
+
+/* ---------------- Hybrid AI content generation ---------------- */
+function buildAIPrompt(art){
+  return `شما دستیار تولید محتوای اینستاگرام برای یک آموزشگاه هنری کودک و نوجوان هستید. لحن باید گرم، صمیمی و فارسی روان باشد.
+اطلاعات اثر:
+عنوان: ${art.title}
+هنرجو: ${art.student || 'نامشخص'} (${art.age || '—'} ساله)
+تکنیک: ${art.technique || 'نامشخص'}
+موضوع: ${art.subject || 'نامشخص'}
+
+فقط و فقط یک JSON خام (بدون Markdown، بدون توضیح اضافه، بدون \`\`\`) با دقیقاً این ساختار برگردان:
+{"caption": "متن کپشن فارسی گرم و صمیمی، حداکثر ۴ خط، با یک یا دو ایموجی مناسب", "hashtags": ["#...", "#...", "#...", "#...", "#..."], "reel_title": "عنوان کوتاه ایده ریلز اینستاگرام", "reel_desc": "توضیح یک یا دو خطی ایده ریلز"}`;
+}
+
+function parseAIJson(text){
+  const cleaned = text.replace(/```json/gi,'').replace(/```/g,'').trim();
+  const start = cleaned.indexOf('{');
+  const end = cleaned.lastIndexOf('}');
+  if(start===-1 || end===-1) throw new Error('no json found');
+  const parsed = JSON.parse(cleaned.slice(start, end+1));
+  if(!parsed.caption || !Array.isArray(parsed.hashtags)) throw new Error('invalid shape');
+  return {
+    caption: parsed.caption,
+    hashtags: parsed.hashtags,
+    reelTitle: parsed.reel_title || 'ایده ریلز',
+    reelDesc: parsed.reel_desc || ''
+  };
+}
+
+function fetchWithTimeout(url, opts={}, ms=8000){
+  const ctrl = new AbortController();
+  const t = setTimeout(()=>ctrl.abort(), ms);
+  return fetch(url, { ...opts, signal: ctrl.signal }).finally(()=>clearTimeout(t));
+}
+
+async function tryClaudeAI(prompt){
+  const res = await fetchWithTimeout("https://api.anthropic.com/v1/messages", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      model: "claude-sonnet-4-6",
+      max_tokens: 600,
+      messages: [{ role: "user", content: prompt }]
+    })
+  });
+  if(!res.ok) throw new Error('claude api not available');
+  const data = await res.json();
+  const text = (data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('\n');
+  return parseAIJson(text);
+}
+
+async function tryGeminiAI(prompt){
+  const key = DATA.settings.geminiKey;
+  if(!key) throw new Error('no gemini key set');
+  const res = await fetchWithTimeout(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${key}`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }] })
+  });
+  if(!res.ok) throw new Error('gemini api failed');
+  const data = await res.json();
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+  return parseAIJson(text);
+}
+
+async function generateAIContent(art){
+  const prompt = buildAIPrompt(art);
+  // Skip network attempts entirely when offline, so we don't make the user wait on a dead connection.
+  if(typeof navigator !== 'undefined' && navigator.onLine === false){
+    const tmpl = generateCaption(art);
+    const reel = generateReelIdea();
+    return { caption: tmpl.caption, hashtags: tmpl.hashtags, reelTitle: reel.title, reelDesc: reel.desc, source: 'template' };
+  }
+  try{
+    const r = await tryClaudeAI(prompt);
+    return { ...r, source: 'claude' };
+  }catch(e){ /* fall through */ }
+  try{
+    const r = await tryGeminiAI(prompt);
+    return { ...r, source: 'gemini' };
+  }catch(e){ /* fall through */ }
+  const tmpl = generateCaption(art);
+  const reel = generateReelIdea();
+  return { caption: tmpl.caption, hashtags: tmpl.hashtags, reelTitle: reel.title, reelDesc: reel.desc, source: 'template' };
+}
+
+function sourceLabel(src){
+  return {
+    claude: icon('sparkle',13)+' تولید شده با هوش مصنوعی Claude',
+    gemini: icon('globe',13)+' تولید شده با Gemini',
+    template: icon('file',13)+' قالب آفلاین (بدون اتصال هوش مصنوعی)'
+  }[src] || '';
+}
+
+/* ---------------- Image resize helper ---------------- */
+function resizeImage(file, maxW=480){
+  return new Promise((resolve,reject)=>{
+    const reader = new FileReader();
+    reader.onload = e => {
+      const img = new Image();
+      img.onload = () => {
+        const scale = Math.min(1, maxW/img.width);
+        const canvas = document.createElement('canvas');
+        canvas.width = img.width*scale;
+        canvas.height = img.height*scale;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img,0,0,canvas.width,canvas.height);
+        resolve(canvas.toDataURL('image/jpeg', 0.75));
+      };
+      img.onerror = reject;
+      img.src = e.target.result;
+    };
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+}
+
+const PLACEHOLDER_IMG = "data:image/svg+xml;utf8," + encodeURIComponent(`
+<svg xmlns='http://www.w3.org/2000/svg' width='300' height='400'>
+<rect width='100%' height='100%' fill='#EDE3D1'/>
+<text x='50%' y='50%' font-size='40' text-anchor='middle' dy='.3em'>🎨</text>
+</svg>`);
+
+/* ---------------- In-app camera + media vault ---------------- */
+/* Uses getUserMedia so photos never touch the device's native gallery/Photos app.
+   Captured shots are saved directly into our own mediaVault storage. */
+async function openCamera(onCapture){
+  const overlay = document.createElement('div');
+  overlay.className='sheet-overlay';
+  overlay.style.alignItems='center';
+  overlay.innerHTML = `
+    <div class="sheet" style="border-radius:22px; max-height:90vh; text-align:center">
+      <div class="sheet-handle"></div>
+      <div style="font-weight:700; margin-bottom:10px">دوربین</div>
+      <div id="camWrap" style="border-radius:14px; overflow:hidden; background:#000; position:relative">
+        <video id="camVideo" autoplay playsinline style="width:100%; display:block; max-height:50vh"></video>
+      </div>
+      <div id="camMsg" style="font-size:12.5px; color:var(--gray); margin-top:10px"></div>
+      <div style="display:flex; gap:10px; margin-top:14px">
+        <button class="btn secondary" id="camCancel">انصراف</button>
+        <button class="btn" id="camShoot">📸 ثبت عکس</button>
+      </div>
+    </div>`;
+  document.body.appendChild(overlay);
+
+  const video = overlay.querySelector('#camVideo');
+  const msg = overlay.querySelector('#camMsg');
+  let stream = null;
+  try{
+    stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio:false });
+    video.srcObject = stream;
+  }catch(e){
+    msg.textContent = 'دسترسی به دوربین ممکن نشد. مرورگر یا مجوز دوربین را بررسی کن.';
+  }
+
+  function cleanup(){
+    if(stream) stream.getTracks().forEach(t=>t.stop());
+    overlay.remove();
+  }
+  overlay.querySelector('#camCancel').onclick = cleanup;
+  overlay.querySelector('#camShoot').onclick = ()=>{
+    if(!stream){ toast('دوربین در دسترس نیست'); return; }
+    const canvas = document.createElement('canvas');
+    const maxW = 480;
+    const scale = Math.min(1, maxW/video.videoWidth);
+    canvas.width = video.videoWidth*scale;
+    canvas.height = video.videoHeight*scale;
+    canvas.getContext('2d').drawImage(video,0,0,canvas.width,canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.75);
+    cleanup();
+    onCapture(dataUrl);
+  };
+}
+
+function saveToVault(dataUrl){
+  const item = { id: uid(), dataUrl, createdAt: new Date().toISOString().slice(0,10) };
+  DATA.mediaVault.push(item);
+  saveData();
+  return item;
+}
+
+function deleteMedia(id){
+  DATA.mediaVault = DATA.mediaVault.filter(m=>m.id!==id);
+  saveData(); render();
+}
+
+function openVaultPicker(onPick){
+  const overlay = document.createElement('div');
+  overlay.className='sheet-overlay';
+  overlay.onclick = (e)=>{ if(e.target===overlay) overlay.remove(); };
+  const items = DATA.mediaVault.slice().reverse();
+  overlay.innerHTML = `
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      <div style="font-weight:700; margin-bottom:12px">انتخاب از مخزن رسانه</div>
+      ${items.length===0 ? `<div class="empty" style="padding:20px 0">مخزن خالی است. اول با دوربین عکس بگیر.</div>` :
+        `<div class="art-grid">${items.map(m=>`
+          <div class="art-tile" data-pick="${m.id}">
+            <img src="${m.dataUrl}">
+          </div>`).join('')}</div>`}
+    </div>`;
+  document.body.appendChild(overlay);
+  overlay.querySelectorAll('[data-pick]').forEach(el=>{
+    el.onclick = ()=>{
+      const item = DATA.mediaVault.find(m=>m.id===el.dataset.pick);
+      overlay.remove();
+      onPick(item.dataUrl);
+    };
+  });
+}
+
+/* ---------------- Views ---------------- */
+function render(){
+  const app = document.getElementById('app');
+  app.innerHTML = `
+    <div class="topbar">
+      <div class="topbar-row">
+        <div>
+          <h1>${pageTitle()}</h1>
+          <div class="sub">${pageSub()}</div>
+        </div>
+        ${VIEW.name!=="home" ? `<button class="icon-btn" onclick="goto('home')">${icon('home')}</button>` : `<button class="icon-btn" onclick="goto('settings')">${icon('settings')}</button>`}
+      </div>
+    </div>
+    <div class="content" id="content"></div>
+    ${bottomNav()}
+  `;
+  const content = document.getElementById('content');
+  content.innerHTML = viewHtml();
+  saveData();
+}
+
+function pageTitle(){
+  return {
+    home: "سلام", artworks: "آثار", artdetail: "جزئیات اثر", addart: "ثبت اثر جدید",
+    content: "کپشن و هشتگ", ideas: "بانک ایده‌ها", calendar: "تقویم محتوا",
+    exhibitions: "نمایشگاه‌ها", exdetail: "انتخاب آثار", students: "هنرجویان",
+    settings: "تنظیمات", label: "چاپ لیبل", media: "مخزن رسانه"
+  }[VIEW.name] || "بانک محتوا";
+}
+function pageSub(){
+  return {
+    home: "امروز چه چیزی خلق می‌کنیم؟",
+    artworks: `${DATA.artworks.length} اثر ثبت‌شده`,
+    ideas: `${DATA.ideas.length} ایده ذخیره‌شده`,
+    exhibitions: `${DATA.exhibitions.length} نمایشگاه`,
+    students: `${DATA.students.length} هنرجو`
+  }[VIEW.name] || "";
+}
+
+function bottomNav(){
+  const items = [
+    {n:'home', ic:'home', label:'خانه'},
+    {n:'artworks', ic:'image', label:'آثار'},
+    {n:'FAB', ic:'plus', label:''},
+    {n:'calendar', ic:'calendar', label:'تقویم'},
+    {n:'more', ic:'menu', label:'بیشتر'}
+  ];
+  return `<div class="bottomnav">
+    ${items.map(it=>{
+      if(it.n==='FAB') return `<button class="fab" onclick="goto('addart')">${icon('plus',20)}</button>`;
+      if(it.n==='more') return `<button class="nav-item" onclick="openMoreSheet()">${icon(it.ic,19)}${it.label}</button>`;
+      const active = VIEW.name===it.n ? 'active':'';
+      return `<button class="nav-item ${active}" onclick="goto('${it.n}')">${icon(it.ic,19)}${it.label}</button>`;
+    }).join('')}
+  </div>`;
+}
+
+function openMoreSheet(){
+  const overlay = document.createElement('div');
+  overlay.className='sheet-overlay';
+  overlay.onclick = (e)=>{ if(e.target===overlay) overlay.remove(); };
+  overlay.innerHTML = `
+    <div class="sheet">
+      <div class="sheet-handle"></div>
+      ${moreBtn('image','بانک ایده‌ها','ideas')}
+      ${moreBtn('building','نمایشگاه‌ها','exhibitions')}
+      ${moreBtn('users','هنرجویان','students')}
+      ${moreBtn('folder','مخزن رسانه','media')}
+      ${moreBtn('settings','تنظیمات','settings')}
+    </div>`;
+  document.body.appendChild(overlay);
+  window.__closeSheet = ()=>overlay.remove();
+}
+function moreBtn(ic,label,view){
+  return `<button class="list-item" style="width:100%" onclick="window.__closeSheet(); goto('${view}')">
+    <div class="avatar ic-avatar">${icon(ic,18)}</div>
+    <div style="font-weight:600">${label}</div>
+  </button>`;
+}
+
+function viewHtml(){
+  switch(VIEW.name){
+    case 'home': return homeView();
+    case 'artworks': return artworksView();
+    case 'artdetail': return artDetailView();
+    case 'addart': return addArtView();
+    case 'content': return contentGenView();
+    case 'ideas': return ideasView();
+    case 'calendar': return calendarView();
+    case 'exhibitions': return exhibitionsView();
+    case 'exdetail': return exhibitionDetailView();
+    case 'students': return studentsView();
+    case 'settings': return settingsView();
+    case 'label': return labelView();
+    case 'media': return mediaVaultView();
+    default: return homeView();
+  }
+}
+
+/* ---- Home ---- */
+function homeView(){
+  const totalArt = DATA.artworks.length;
+  const totalIdeas = DATA.ideas.length;
+  const selected = DATA.artworks.filter(a=>a.exhibitionSelected).length;
+  return `
+    <button class="btn" onclick="goto('addart')">${icon('plus',17)} ثبت اثر جدید</button>
+    <div class="grid2" style="margin-top:14px">
+      <div class="stat-card"><div class="stat-num">${totalArt}</div><div class="stat-label">آثار ثبت‌شده</div></div>
+      <div class="stat-card"><div class="stat-num">${totalIdeas}</div><div class="stat-label">ایده‌های محتوا</div></div>
+      <div class="stat-card"><div class="stat-num">${selected}</div><div class="stat-label">منتخب نمایشگاه</div></div>
+      <div class="stat-card"><div class="stat-num">${DATA.exhibitions.length}</div><div class="stat-label">نمایشگاه‌ها</div></div>
+    </div>
+    <h2 class="section-title" style="margin-top:20px">آخرین آثار</h2>
+    ${totalArt===0 ? emptyState('image','هنوز اثری ثبت نشده','اولین اثر هنرجو را ثبت کن تا محتوا برایش بسازیم.') :
+      `<div class="art-grid">${DATA.artworks.slice(-4).reverse().map(artTile).join('')}</div>`}
+  `;
+}
+
+function emptyState(ic,title,sub){
+  return `<div class="empty"><div class="e-ic">${icon(ic,30)}</div><div style="font-weight:600;color:var(--ink)">${title}</div><div style="font-size:13px;margin-top:4px">${sub}</div></div>`;
+}
+
+/* ---- Artworks ---- */
+function artTile(a){
+  return `<div class="art-tile" onclick="goto('artdetail',{id:'${a.id}'})">
+    <img src="${a.image || PLACEHOLDER_IMG}">
+    ${a.exhibitionSelected ? `<div class="badge">منتخب</div>` : ''}
+    <div class="cap">${a.title}</div>
+  </div>`;
+}
+
+function artworksView(){
+  if(DATA.artworks.length===0){
+    return emptyState('image','گالری خالی است','برای شروع، یک اثر جدید ثبت کن.') + `<div style="margin-top:14px"><button class="btn" onclick="goto('addart')">${icon('plus',17)} ثبت اثر جدید</button></div>`;
+  }
+  return `<div class="art-grid">${DATA.artworks.slice().reverse().map(artTile).join('')}</div>`;
+}
+
+/* ---- Add artwork ---- */
+let PENDING_IMAGE = null;
+function addArtView(){
+  PENDING_IMAGE = null;
+  const studentOptions = DATA.students.map(s=>`<option value="${s.id}">${s.name}</option>`).join('');
+  return `
+    <div class="card">
+      <label class="field-label">تصویر اثر</label>
+      <div class="upload-box" id="uploadBox">
+        <div id="uploadInner">${icon('image',26)}هنوز تصویری انتخاب نشده</div>
+      </div>
+      <div style="display:flex; gap:8px; margin-top:10px">
+        <button type="button" class="btn small" style="flex:1" onclick="openCamera(url=>{ saveToVault(url); setPendingImage(url); })">${icon('camera',16)} گرفتن عکس</button>
+        <button type="button" class="btn small secondary" style="flex:1" onclick="openVaultPicker(url=>setPendingImage(url))">${icon('folder',16)} از مخزن</button>
+      </div>
+      <button type="button" class="btn small ghost" style="width:100%; margin-top:8px" onclick="document.getElementById('fileInput').click()">انتخاب از فایل گوشی</button>
+      <input type="file" id="fileInput" accept="image/*" style="display:none" onchange="handleFileSelect(event)">
+    </div>
+    <div class="card">
+      <div class="field"><label class="field-label">عنوان اثر</label><input id="f_title" placeholder="مثلاً: کوچه‌ی باران"></div>
+      <div class="field"><label class="field-label">هنرجو</label>
+        <select id="f_student">${studentOptions}<option value="__new">+ هنرجوی جدید</option></select>
+      </div>
+      <div class="field"><label class="field-label">سن هنرجو</label><input id="f_age" type="number" placeholder="مثلاً: 11"></div>
+      <div class="field"><label class="field-label">تکنیک</label><input id="f_technique" placeholder="مثلاً: آبرنگ"></div>
+      <div class="field"><label class="field-label">موضوع</label><input id="f_subject" placeholder="مثلاً: منظره"></div>
+      <div class="field"><label class="field-label">ابعاد</label><input id="f_dim" placeholder="مثلاً: 30x40 cm"></div>
+    </div>
+    <button class="btn" onclick="saveArtwork()">ثبت اثر</button>
+  `;
+}
+
+async function handleFileSelect(e){
+  const file = e.target.files[0];
+  if(!file) return;
+  const dataUrl = await resizeImage(file);
+  setPendingImage(dataUrl);
+}
+
+function setPendingImage(dataUrl){
+  PENDING_IMAGE = dataUrl;
+  const inner = document.getElementById('uploadInner');
+  if(inner) inner.innerHTML = `<img src="${dataUrl}">`;
+}
+
+function saveArtwork(){
+  const title = document.getElementById('f_title').value.trim();
+  const studentSel = document.getElementById('f_student').value;
+  const age = document.getElementById('f_age').value;
+  const technique = document.getElementById('f_technique').value.trim();
+  const subject = document.getElementById('f_subject').value.trim();
+  const dim = document.getElementById('f_dim').value.trim();
+
+  if(!title){ toast('لطفاً عنوان اثر را وارد کن'); return; }
+
+  let studentName = '';
+  if(studentSel === '__new'){
+    studentName = prompt('نام هنرجوی جدید را وارد کن:');
+    if(!studentName) { toast('نام هنرجو وارد نشد'); return; }
+    const newS = { id: uid(), name: studentName, age: Number(age)||null };
+    DATA.students.push(newS);
+  } else {
+    const s = DATA.students.find(s=>s.id===studentSel);
+    studentName = s ? s.name : '';
+  }
+
+  const art = {
+    id: uid(), title, student: studentName, age: age || '',
+    technique, subject, dimensions: dim,
+    date: new Date().toISOString().slice(0,10),
+    image: PENDING_IMAGE || null,
+    status: 'draft', exhibitionSelected: false
+  };
+  DATA.artworks.push(art);
+  saveData();
+  toast('اثر با موفقیت ثبت شد');
+  goto('artdetail', {id: art.id});
+}
+
+/* ---- Artwork detail ---- */
+function artDetailView(){
+  const art = DATA.artworks.find(a=>a.id===VIEW.params.id);
+  if(!art) return emptyState('help','اثر پیدا نشد','');
+  return `
+    <div class="card">
+      <img src="${art.image||PLACEHOLDER_IMG}" style="width:100%;border-radius:14px;margin-bottom:12px;object-fit:cover;max-height:260px">
+      <div style="font-weight:700;font-size:17px">${art.title}</div>
+      <div style="color:var(--gray);font-size:13px;margin-top:2px">${art.student}${art.age? ' | '+art.age+' ساله':''}</div>
+      <div style="margin-top:10px">
+        ${art.technique?`<span class="pill">${art.technique}</span>`:''}
+        ${art.subject?`<span class="pill">${art.subject}</span>`:''}
+        ${art.dimensions?`<span class="pill">${art.dimensions}</span>`:''}
+      </div>
+      <div class="divider"></div>
+      <div class="row" style="font-size:13px;color:var(--gray)"><span>تاریخ ثبت</span><span>${art.date}</span></div>
+      <div class="row" style="font-size:13px;color:var(--gray);margin-top:6px"><span>وضعیت نمایشگاه</span><span>${art.exhibitionSelected?'منتخب':'منتخب نشده'}</span></div>
+    </div>
+    <button class="btn" onclick="goto('content',{id:'${art.id}'})">${icon('sparkle',16)} تولید کپشن و هشتگ</button>
+    <div style="height:10px"></div>
+    <button class="btn secondary" onclick="goto('label',{id:'${art.id}'})">${icon('tag',16)} چاپ لیبل</button>
+    <div style="height:10px"></div>
+    <button class="btn ghost" onclick="toggleExhibitionPick('${art.id}')">${art.exhibitionSelected? icon('close',15)+' حذف از منتخب نمایشگاه' : icon('plus',15)+' انتخاب برای نمایشگاه'}</button>
+  `;
+}
+function toggleExhibitionPick(id){
+  const art = DATA.artworks.find(a=>a.id===id);
+  art.exhibitionSelected = !art.exhibitionSelected;
+  saveData();
+  render();
+  toast(art.exhibitionSelected? 'به منتخب‌ها اضافه شد':'از منتخب‌ها حذف شد');
+}
+
+/* ---- Content generator (hybrid AI: Claude -> Gemini -> offline template) ---- */
+function contentGenView(){
+  const art = DATA.artworks.find(a=>a.id===VIEW.params.id);
+  if(!art) return emptyState('help','اثر پیدا نشد','');
+
+  if(VIEW.params._loading){
+    return `<div class="card" style="text-align:center; padding:40px 16px">
+      <div style="display:flex; justify-content:center; color:var(--accent)">${icon('sparkle',28)}</div>
+      <div style="margin-top:10px; font-weight:600">در حال تولید محتوا...</div>
+      <div style="font-size:12px; color:var(--gray); margin-top:4px">تلاش برای اتصال به هوش مصنوعی</div>
+    </div>`;
+  }
+
+  if(!VIEW.params._gen){
+    VIEW.params._loading = true;
+    runGeneration(art);
+    return contentGenView();
+  }
+
+  const gen = VIEW.params._gen;
+  const reel = VIEW.params._reel;
+  return `
+    <div class="pill active" style="margin-bottom:10px">${sourceLabel(VIEW.params._source)}</div>
+    <div class="card">
+      <div class="row"><h2 class="section-title" style="margin:0">کپشن پیشنهادی</h2><button class="btn small ghost" onclick="regenerateContent('${art.id}')">${icon('refresh',14)} بازتولید</button></div>
+      <textarea rows="7" id="captionText" style="margin-top:8px">${gen.caption}</textarea>
+    </div>
+    <div class="card">
+      <h2 class="section-title">هشتگ‌ها</h2>
+      <div>${gen.hashtags.map(h=>`<span class="pill">${h}</span>`).join('')}</div>
+    </div>
+    <div class="card">
+      <h2 class="section-title" style="margin:0 0 6px">ایده ریلز پیشنهادی</h2>
+      <div style="font-weight:600">${reel.title}</div>
+      <div style="font-size:13px;color:var(--gray);margin-top:4px">${reel.desc}</div>
+    </div>
+    <button class="btn" onclick="saveIdea('${art.id}')">${icon('bookmark',16)} ذخیره در بانک ایده‌ها</button>
+  `;
+}
+
+async function runGeneration(art){
+  const result = await generateAIContent(art);
+  VIEW.params._gen = { caption: result.caption, hashtags: result.hashtags };
+  VIEW.params._reel = { title: result.reelTitle, desc: result.reelDesc };
+  VIEW.params._source = result.source;
+  VIEW.params._loading = false;
+  render();
+}
+
+function regenerateContent(id){
+  VIEW.params._gen = null;
+  VIEW.params._loading = true;
+  render();
+  runGeneration(DATA.artworks.find(a=>a.id===id));
+}
+function saveIdea(id){
+  const art = DATA.artworks.find(a=>a.id===id);
+  const caption = document.getElementById('captionText').value;
+  DATA.ideas.push({
+    id: uid(), artId: id, artTitle: art.title, type:'پست',
+    caption, hashtags: VIEW.params._gen.hashtags, reel: VIEW.params._reel,
+    createdAt: new Date().toISOString().slice(0,10)
+  });
+  saveData();
+  toast('در بانک ایده‌ها ذخیره شد');
+  goto('ideas');
+}
+
+/* ---- Idea bank ---- */
+function ideasView(){
+  if(DATA.ideas.length===0) return emptyState('bulb','بانک ایده خالی است','از صفحه‌ی اثر، محتوا تولید و ذخیره کن.');
+  return DATA.ideas.slice().reverse().map(idea=>`
+    <div class="card">
+      <div class="row"><span class="pill active">${idea.type}</span><span style="font-size:12px;color:var(--gray)">${idea.createdAt}</span></div>
+      <div style="font-weight:700;margin-top:8px">${idea.artTitle}</div>
+      <div style="font-size:13px;color:var(--gray);margin-top:4px;white-space:pre-line">${idea.caption.slice(0,110)}${idea.caption.length>110?'…':''}</div>
+      <button class="btn secondary small" style="margin-top:10px" onclick="goto('artdetail',{id:'${idea.artId}'})">مشاهده اثر</button>
+    </div>
+  `).join('');
+}
+
+/* ---- Calendar ---- */
+function calendarView(){
+  const artOptions = DATA.artworks.map(a=>`<option value="${a.id}">${a.title}</option>`).join('');
+  return `
+    <div class="card">
+      <h2 class="section-title">افزودن به تقویم</h2>
+      <div class="field"><label class="field-label">اثر</label><select id="cal_art">${artOptions || '<option>ابتدا اثری ثبت کن</option>'}</select></div>
+      <div class="field"><label class="field-label">تاریخ انتشار</label><input id="cal_date" type="date"></div>
+      <button class="btn" onclick="addSchedule()">افزودن به تقویم</button>
+    </div>
+    <h2 class="section-title">برنامه‌ی محتوا</h2>
+    ${DATA.schedule.length===0 ? emptyState('calendar','برنامه‌ای ثبت نشده','') :
+      DATA.schedule.slice().sort((a,b)=>a.date.localeCompare(b.date)).map(sc=>`
+        <div class="list-item">
+          <div class="avatar ic-avatar">${icon('pin',17)}</div>
+          <div style="flex:1">
+            <div style="font-weight:600">${sc.artTitle}</div>
+            <div style="font-size:12px;color:var(--gray)">${sc.date}</div>
+          </div>
+        </div>
+      `).join('')}
+  `;
+}
+function addSchedule(){
+  const artId = document.getElementById('cal_art').value;
+  const date = document.getElementById('cal_date').value;
+  const art = DATA.artworks.find(a=>a.id===artId);
+  if(!art || !date){ toast('اثر و تاریخ را انتخاب کن'); return; }
+  DATA.schedule.push({ id: uid(), artId, artTitle: art.title, date });
+  saveData(); render();
+  toast('به تقویم اضافه شد');
+}
+
+/* ---- Exhibitions ---- */
+function exhibitionsView(){
+  return `
+    <div class="card">
+      <h2 class="section-title">ایجاد نمایشگاه جدید</h2>
+      <div class="field"><input id="ex_title" placeholder="عنوان نمایشگاه"></div>
+      <div class="field"><input id="ex_date" type="date"></div>
+      <button class="btn" onclick="createExhibition()">ایجاد نمایشگاه</button>
+    </div>
+    ${DATA.exhibitions.length===0 ? emptyState('building','نمایشگاهی ثبت نشده','') :
+      DATA.exhibitions.slice().reverse().map(ex=>`
+        <div class="list-item" onclick="goto('exdetail',{id:'${ex.id}'})">
+          <div class="avatar ic-avatar">${icon('building',18)}</div>
+          <div style="flex:1">
+            <div style="font-weight:600">${ex.title}</div>
+            <div style="font-size:12px;color:var(--gray)">${ex.date} | ${ex.artIds.length} اثر</div>
+          </div>
+        </div>
+      `).join('')}
+  `;
+}
+function createExhibition(){
+  const title = document.getElementById('ex_title').value.trim();
+  const date = document.getElementById('ex_date').value;
+  if(!title){ toast('عنوان نمایشگاه را وارد کن'); return; }
+  const ex = { id: uid(), title, date: date||'', artIds: DATA.artworks.filter(a=>a.exhibitionSelected).map(a=>a.id) };
+  DATA.exhibitions.push(ex);
+  saveData(); goto('exdetail',{id:ex.id});
+}
+function exhibitionDetailView(){
+  const ex = DATA.exhibitions.find(e=>e.id===VIEW.params.id);
+  if(!ex) return emptyState('help','نمایشگاه پیدا نشد','');
+  return `
+    <div class="card">
+      <div style="font-weight:700;font-size:16px">${ex.title}</div>
+      <div style="font-size:13px;color:var(--gray)">${ex.date || 'بدون تاریخ'} | ${ex.artIds.length} اثر انتخاب‌شده</div>
+    </div>
+    <h2 class="section-title">انتخاب آثار برای این نمایشگاه</h2>
+    <div class="art-grid">
+      ${DATA.artworks.map(a=>{
+        const sel = ex.artIds.includes(a.id);
+        return `<div class="art-tile" style="${sel?'outline:3px solid var(--accent)':''}" onclick="toggleExArt('${ex.id}','${a.id}')">
+          <img src="${a.image||PLACEHOLDER_IMG}">
+          ${sel?`<div class="badge">${icon('check',11)} انتخاب</div>`:''}
+          <div class="cap">${a.title}</div>
+        </div>`;
+      }).join('')}
+    </div>
+  `;
+}
+function toggleExArt(exId, artId){
+  const ex = DATA.exhibitions.find(e=>e.id===exId);
+  const i = ex.artIds.indexOf(artId);
+  if(i>-1) ex.artIds.splice(i,1); else ex.artIds.push(artId);
+  saveData(); render();
+}
+
+/* ---- Students ---- */
+function studentsView(){
+  return `
+    <div class="card">
+      <h2 class="section-title">افزودن هنرجو</h2>
+      <div class="field"><input id="st_name" placeholder="نام هنرجو"></div>
+      <div class="field"><input id="st_age" type="number" placeholder="سن"></div>
+      <button class="btn" onclick="addStudent()">افزودن</button>
+    </div>
+    ${DATA.students.map(s=>{
+      const count = DATA.artworks.filter(a=>a.student===s.name).length;
+      return `<div class="list-item">
+        <div class="avatar">${s.name[0]}</div>
+        <div style="flex:1">
+          <div style="font-weight:700">${s.name}</div>
+          <div style="font-size:12px;color:var(--gray)">${s.age? s.age+' ساله | ':''}${count} اثر</div>
+        </div>
+      </div>`;
+    }).join('')}
+  `;
+}
+function addStudent(){
+  const name = document.getElementById('st_name').value.trim();
+  const age = document.getElementById('st_age').value;
+  if(!name){ toast('نام هنرجو را وارد کن'); return; }
+  DATA.students.push({ id: uid(), name, age: Number(age)||null });
+  saveData(); render();
+  toast('هنرجو اضافه شد');
+}
+
+/* ---- Settings ---- */
+function settingsView(){
+  return `
+    <div class="card">
+      <div class="field"><label class="field-label">نام آموزشگاه</label><input id="set_name" value="${DATA.settings.schoolName}"></div>
+      <button class="btn" onclick="saveSettings()">ذخیره تغییرات</button>
+    </div>
+    <div class="card">
+      <h2 class="section-title">تولید محتوا با هوش مصنوعی</h2>
+      <div style="font-size:12.5px; color:var(--gray); line-height:1.9; margin-bottom:10px">
+        وقتی این اپ داخل Claude باز است، تولید کپشن/هشتگ/ریلز به‌طور رایگان با هوش مصنوعی Claude انجام می‌شود.
+        اگر می‌خواهی این اپ به‌صورت مستقل (خارج از Claude) هم با هوش مصنوعی واقعی کار کند، یک کلید رایگان از
+        Google AI Studio (aistudio.google.com) بگیر و اینجا وارد کن. اگر هیچ‌کدام در دسترس نبود، از یک قالب آفلاین ساده استفاده می‌شود.
+      </div>
+      <div class="field"><label class="field-label">کلید Gemini (اختیاری)</label><input id="set_gemini" placeholder="AIza..." value="${DATA.settings.geminiKey||''}"></div>
+      <button class="btn secondary" onclick="saveSettings()">ذخیره کلید</button>
+    </div>
+    <div class="card">
+      <h2 class="section-title">پوسته‌ی رنگی</h2>
+      <div class="theme-swatch-row">
+        ${Object.keys(THEMES).map(key=>{
+          const t = THEMES[key];
+          const active = (DATA.settings.theme||'warm')===key ? 'active' : '';
+          return `<div class="theme-swatch ${active}" onclick="setTheme('${key}')">
+            <div class="theme-dots">${t.colors.slice(0,4).map(c=>`<span class="theme-dot" style="background:${c}"></span>`).join('')}</div>
+            ${t.label}
+          </div>`;
+        }).join('')}
+      </div>
+    </div>
+    <div class="card">
+      <h2 class="section-title">پشتیبان‌گیری از اطلاعات</h2>
+      <div style="font-size:12.5px; color:var(--gray); line-height:1.9; margin-bottom:10px">
+        اطلاعات این اپ فقط روی همین گوشی/مرورگر ذخیره می‌شود. برای جلوگیری از گم‌شدن اطلاعات (مثلاً هنگام تعویض گوشی)، هر چند وقت یک‌بار یک فایل پشتیبان بگیر. در مرورگرهایی که امکانش را داشته باشند، هنگام دانلود از تو می‌خواهد پوشه‌ی ذخیره را خودت انتخاب کنی.
+      </div>
+      <button class="btn secondary" onclick="exportBackup()">${icon('file',16)} دانلود فایل پشتیبان</button>
+      <div style="height:8px"></div>
+      <button class="btn ghost" onclick="document.getElementById('restoreInput').click()">${icon('folder',16)} بازیابی از فایل پشتیبان</button>
+      <input type="file" id="restoreInput" accept="application/json" style="display:none" onchange="importBackupFile(event)">
+    </div>
+    <div class="card">
+      <h2 class="section-title">نصب اپ روی گوشی</h2>
+      <div style="font-size:12.5px; color:var(--gray); line-height:1.9; margin-bottom:10px">
+        این اپ را می‌توان مثل یک اپ واقعی روی صفحه‌ی اصلی گوشی نصب کرد. در اندروید/کروم می‌توانی از دکمه‌ی زیر استفاده کنی؛ در آیفون/سافاری از منوی اشتراک‌گذاری گزینه‌ی «Add to Home Screen» را بزن.
+      </div>
+      <button class="btn secondary" onclick="triggerInstall()">${icon('plus',16)} نصب اپ</button>
+    </div>
+  `;
+}
+function saveSettings(){
+  DATA.settings.schoolName = document.getElementById('set_name').value.trim() || DATA.settings.schoolName;
+  const geminiEl = document.getElementById('set_gemini');
+  if(geminiEl) DATA.settings.geminiKey = geminiEl.value.trim();
+  saveData(); toast('تنظیمات ذخیره شد');
+}
+
+/* ---- Media vault ---- */
+function mediaVaultView(){
+  const items = DATA.mediaVault.slice().reverse();
+  return `
+    <button class="btn" onclick="openCamera(url=>{ saveToVault(url); toast('عکس در مخزن ذخیره شد'); render(); })">${icon('camera',16)} گرفتن عکس جدید</button>
+    <div style="font-size:12px; color:var(--gray); margin-top:8px; line-height:1.8">
+      عکس‌های گرفته‌شده از داخل اپ مستقیماً اینجا ذخیره می‌شوند و وارد گالری گوشی نمی‌شوند.
+      از این مخزن می‌توانی هنگام ثبت اثر، تصویر را دوباره انتخاب کنی.
+    </div>
+    <h2 class="section-title" style="margin-top:16px">مخزن تصاویر (${DATA.mediaVault.length})</h2>
+    ${items.length===0 ? emptyState('folder','مخزن خالی است','با دوربین بالا یک عکس بگیر تا اینجا ذخیره شود.') :
+      `<div class="art-grid">${items.map(m=>`
+        <div class="art-tile">
+          <img src="${m.dataUrl}">
+          <div class="cap">${m.createdAt}</div>
+          <button onclick="event.stopPropagation(); deleteMedia('${m.id}')" style="position:absolute; top:8px; right:8px; background:rgba(0,0,0,.45); color:#fff; border:none; border-radius:50%; width:26px; height:26px; cursor:pointer; display:flex; align-items:center; justify-content:center">${icon('close',13)}</button>
+        </div>`).join('')}</div>`}
+  `;
+}
+
+/* ---- Label / print ---- */
+function labelView(){
+  const art = DATA.artworks.find(a=>a.id===VIEW.params.id);
+  if(!art) return emptyState('help','اثر پیدا نشد','');
+  return `
+    <div class="card" style="text-align:center">
+      <img src="${art.image||PLACEHOLDER_IMG}" style="width:100%;max-height:180px;object-fit:cover;border-radius:12px;margin-bottom:12px">
+      <div style="font-weight:700">${art.title}</div>
+      <div style="font-size:13px;color:var(--gray)">${art.student} ${art.age?'| '+art.age+' ساله':''}</div>
+      <div style="font-size:12px;color:var(--gray);margin-top:4px">${art.technique||''} ${art.dimensions? '| '+art.dimensions:''}</div>
+      <div class="qr">${pseudoQR(art.id)}</div>
+      <div style="font-size:11px;color:var(--gray);margin-top:6px">کد اثر: ${art.id.toUpperCase()}</div>
+    </div>
+    <button class="btn" onclick="window.print()">${icon('print',16)} پیش‌نمایش و چاپ</button>
+  `;
+}
+function pseudoQR(seed){
+  let s = 0; for(const c of seed) s += c.charCodeAt(0);
+  let rnd = s;
+  const next = ()=> (rnd = (rnd*9301+49297)%233280)/233280;
+  let rects='';
+  for(let y=0;y<8;y++) for(let x=0;x<8;x++){
+    if(next()>0.5) rects += `<rect x="${x*14}" y="${y*14}" width="12" height="12" fill="#3A3733"/>`;
+  }
+  return `<svg viewBox="0 0 112 112" width="100%" height="100%">${rects}</svg>`;
+}
+
+loadData();
+</script>
+</body>
+</html>
