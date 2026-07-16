@@ -15,12 +15,25 @@ icon-512.png        آیکون اپ
 ## گام ۱: آپلود روی گیت‌هاب
 1. یک ریپازیتوری جدید در گیت‌هاب بساز (مثلاً `atelier-app`).
 2. تمام فایل‌ها (`index.html`, `manifest.json`, `sw.js`, `icon-192.png`, `icon-512.png`) را مستقیم در ریشه‌ی ریپازیتوری آپلود کن — بدون پوشه‌ی جدا.
-3. به تنظیمات ریپازیتوری برو: **Settings → Pages**.
-4. در بخش **Source**، شاخه‌ی `main` و پوشه‌ی `/ (root)` را انتخاب و ذخیره کن.
-5. بعد از حدود ۱ دقیقه، آدرسی شبیه این فعال می‌شود:
-   `https://USERNAME.github.io/atelier-app/`
 
-نکته‌ی مهم: نصب PWA و دسترسی به دوربین فقط روی **HTTPS** کار می‌کند. گیت‌هاب Pages به‌صورت پیش‌فرض HTTPS است، پس نیازی به تنظیم اضافه نیست.
+## گام ۲: دیپلوی روی Cloudflare Pages (نه Workers)
+این اپ یک سایت استاتیک ساده است (بدون نیاز به build یا سرور)، پس باید حتماً از بخش **Pages** دیپلوی بشه، نه از بخش **Workers**. این دو تو کلودفلر جدا هستن:
+- **Pages** (آدرس خروجی `xxx.pages.dev`) → مخصوص همین نوع سایت، فایل‌ها رو مستقیم سرو می‌کنه. **این گزینه‌ی درست است.**
+- **Workers** (آدرس خروجی `xxx.workers.dev`) → برای اجرای کد سمت سرور طراحی شده و بدون تنظیمات اضافه، فایل استاتیک رو درست سرو نمی‌کنه.
+
+مراحل:
+1. **dash.cloudflare.com → Workers & Pages → Create**
+2. حتماً تب **Pages** رو انتخاب کن (نه Workers) → **Connect to Git**
+3. ریپازیتوری `atelier-app` را انتخاب کن
+4. تنظیمات build:
+   - **Framework preset:** `None`
+   - **Build command:** خالی بگذار
+   - **Build output directory:** `/`
+5. **Save and Deploy**
+
+بعد از دیپلوی، آدرسی شبیه `https://atelier-app.pages.dev` می‌گیری که بدون هیچ تنظیم اضافه‌ای کار می‌کند (HTTPS پیش‌فرض، دوربین و نصب PWA بدون مشکل کار می‌کنند).
+
+اگر ریپو private است، باید اول به Cloudflare Pages دسترسی‌اش را بدهی: GitHub → Settings → Applications → Installed GitHub Apps → Cloudflare Pages → Configure → ریپو را در Repository access اضافه کن.
 
 ## گام ۲: نصب روی موبایل
 
