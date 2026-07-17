@@ -2,7 +2,7 @@
   "name": "بانک محتوای آموزشگاه",
   "short_name": "بانک محتوا",
   "description": "اپ مدیریت محتوای هنری آموزشگاه نقاشی: ثبت آثار، تولید کپشن و هشتگ، مدیریت نمایشگاه‌ها",
-  "start_url": "./index.html",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",

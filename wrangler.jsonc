@@ -1,14 +1,10 @@
 {
-  "$schema": "node_modules/wrangler/config-schema.json",
+  // این فایل به کلودفلر می‌گوید که این پروژه فقط شامل فایل‌های استاتیک است
+  // (بدون نیاز به کد سمت سرور)، پس درخواست‌ها را مستقیم از این پوشه سرو کند.
   "name": "atelierkia",
-  "compatibility_date": "2026-07-16",
-  "observability": {
-    "enabled": true
-  },
+  "compatibility_date": "2026-07-01",
   "assets": {
-    "directory": "."
-  },
-  "compatibility_flags": [
-    "nodejs_compat"
-  ]
+    "directory": ".",
+    "not_found_handling": "single-page-application"
+  }
 }

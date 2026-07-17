@@ -1,13 +1,24 @@
-// Minimal offline-first service worker for the "بانک محتوای آموزشگاه" app.
-// Caches the app shell (HTML/manifest/icons) so the app still opens with no
-// internet connection. It does NOT cache API calls (Claude/Gemini) or fonts
-// aggressively - those simply fail gracefully and the app falls back to the
-// offline caption template (see generateAIContent in index.html).
+// Service worker for "بانک محتوای آموزشگاه".
+// Caches the app shell (manifest/icons) so the app still opens with no
+// internet connection. Does NOT cache API calls (Claude/Gemini) - those
+// simply fail gracefully and the app falls back to the offline caption
+// template (see generateAIContent in index.html).
+//
+// v2: fixed a bug where, on the SECOND app open (once this service worker
+// was actually controlling the page), navigation requests could fail with
+// net::ERR_FAILED. The cause: the browser's navigation request object has
+// mode:'navigate' and redirect:'manual' baked in, and re-using that exact
+// request object inside fetch() here could resolve to a broken/opaque
+// response instead of a real page - which the browser then reports as
+// ERR_FAILED. The fix is to never reuse the navigation Request object for
+// re-fetching; instead we build a plain new request from just the URL, and
+// we always guarantee event.respondWith() resolves to a real Response
+// (never to `undefined`), which is the other thing that can silently trigger
+// ERR_FAILED.
 
-const CACHE_NAME = 'atelier-shell-v1';
+const CACHE_NAME = 'atelier-shell-v2';
 const APP_SHELL = [
   './',
-  './index.html',
   './manifest.json',
   './icon-192.png',
   './icon-512.png'
@@ -15,7 +26,9 @@ const APP_SHELL = [
 
 self.addEventListener('install', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(APP_SHELL)).catch(() => {})
+    caches.open(CACHE_NAME)
+      .then((cache) => cache.addAll(APP_SHELL))
+      .catch((err) => console.error('SW install cache error', err))
   );
   self.skipWaiting();
 });
@@ -34,24 +47,37 @@ self.addEventListener('fetch', (event) => {
   if (req.method !== 'GET') return;
 
   const url = new URL(req.url);
-  // Never intercept calls to AI APIs - always go to the network for those.
-  if (url.origin.includes('anthropic.com') || url.origin.includes('googleapis.com')) return;
+  // Never intercept cross-origin calls (AI APIs, Google Fonts, etc.) -
+  // always let those go straight to the network untouched.
+  if (url.origin !== self.location.origin) return;
 
-  // App shell files: cache-first, refresh cache in the background.
-  if (url.origin === self.location.origin) {
+  // Page navigations (opening the app / the installed PWA's start_url):
+  // network-first, using a *fresh* request (not the original navigation
+  // request object - see note above), falling back to the cached shell
+  // only if there's truly no network.
+  if (req.mode === 'navigate') {
     event.respondWith(
-      caches.match(req).then((cached) => {
-        const fetchPromise = fetch(req)
-          .then((res) => {
-            if (res && res.ok) {
-              const clone = res.clone();
-              caches.open(CACHE_NAME).then((cache) => cache.put(req, clone));
-            }
-            return res;
-          })
-          .catch(() => cached);
-        return cached || fetchPromise;
-      })
+      fetch(url.pathname + url.search, { cache: 'no-store' })
+        .catch(() => caches.match('./'))
+        .then((res) => res || Response.error())
     );
+    return;
   }
+
+  // Other same-origin static assets (icons, manifest): cache-first, and
+  // refresh the cache in the background for next time.
+  event.respondWith(
+    caches.match(req).then((cached) => {
+      const network = fetch(req)
+        .then((res) => {
+          if (res && res.ok) {
+            const clone = res.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(req, clone)).catch(() => {});
+          }
+          return res;
+        })
+        .catch(() => null);
+      return cached || network.then((res) => res || Response.error());
+    })
+  );
 });
